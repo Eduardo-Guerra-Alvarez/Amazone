@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/new/prefix1">
+        <file>silueta-de-usuario.svg</file>
+        <file>crear-boton-de-grupo.svg</file>
+    </qresource>
+</RCC>
