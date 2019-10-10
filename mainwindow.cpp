@@ -238,7 +238,7 @@ void MainWindow::on_loginPB_clicked()
                 ui->emailLE->clear();
                 ui->passwordLE->clear();
                 ui->stackedWidget->setCurrentIndex(2);
-                llenarWidget(0);
+                llenarWidget();
                 break;
             }
             else {
@@ -285,56 +285,65 @@ void MainWindow::llenarWidget(int item, int order, QString bus)
         p.setID(jobj["id"].toString());
         p.setDescription(jobj["name"].toString());
         p.setPrice(jobj["price"].toDouble());
-        if (item == 0)
-        {
-            products.push_back(p);
-        }
-        //Si el combobox esta en la posicion 1
-        else if (item == 1){
-            //En el JsonArray buscara aquellas que inicien con "AB"
-            if(p.getID().startsWith("AB") == true){
+        //Comprueba que la palabra a buscar coincida con la descripcion
+        //sin importar mayusculas o minusculas
+        if (p.getDescription().contains(bus, Qt::CaseInsensitive) == true){
+            if (item == 0)
+            {
+                //Guarda los productos filtrados en el vector
                 products.push_back(p);
             }
-        }
-        //Si esta en la posicion 2
-        else if (item == 2){
-            //Si inicia con "L"
-            if(p.getID().startsWith("L") == true){
-                products.push_back(p);
+            //Si el combobox esta en la posicion 1
+            else if (item == 1){
+                //En el JsonArray buscara aquellas que inicien con "AB"
+                if(p.getID().startsWith("AB") == true){
+                    products.push_back(p);
+                }
             }
-        }
-        //Si esta en la posicion 3
-        else if (item == 3){
-            //Si inicia con "E"
-            if(p.getID().startsWith("E") == true){
-                products.push_back(p);
+            //Si esta en la posicion 2
+            else if (item == 2){
+                //Si inicia con "L"
+                if(p.getID().startsWith("L") == true){
+                    products.push_back(p);
+                }
             }
-        }
-        //Si esta en la posicion 4
-        else if (item == 4){
-            //Si inicia con "HC"
-            if(p.getID().startsWith("HC") == true){
-                products.push_back(p);
+            //Si esta en la posicion 3
+            else if (item == 3){
+                //Si inicia con "E"
+                if(p.getID().startsWith("E") == true){
+                    products.push_back(p);
+                }
             }
-        }
-        //Si esta en la posicion 5
-        else if (item == 5){
-            //Si inicia con "D"
-            if(p.getID().startsWith("D") == true){
-                products.push_back(p);
+            //Si esta en la posicion 4
+            else if (item == 4){
+                //Si inicia con "HC"
+                if(p.getID().startsWith("HC") == true){
+                    products.push_back(p);
+                }
+            }
+            //Si esta en la posicion 5
+            else if (item == 5){
+                //Si inicia con "D"
+                if(p.getID().startsWith("D") == true){
+                    products.push_back(p);
+                }
             }
         }
     }
 
+    //En caso de ser 1 se ordena de menor a mayor
     if (order == 1)
+        //Con la funcion sort se ordena el vector
         sort(products.begin(), products.end());
-
+    //En caso de ser 2 se ordena de mayor a menor
     else if (order == 2)
         sort(products.begin(), products.end(), greater<Product>());
 
     QString imagen, texto;
     double precio;
-    for (int i = 0;i < products.size();i++) {
+    //Se recorre el vector
+    size_t i = 0;
+    for (;i < products.size();i++) {
         imagen = products.at(i).getID();
         texto = products.at(i).getDescription();
         precio = products.at(i).getPrice();
@@ -342,173 +351,52 @@ void MainWindow::llenarWidget(int item, int order, QString bus)
         MainWidget *mv = new MainWidget;
         //Se le asigna el tamaño minimo
         mv->setMinimumSize(250,250);
+        //Se le da la ruta de la imagen a insertar
         QPixmap pix("/Users/lalo/Desktop/Amazone/imgs/" + imagen);
+        //Se mandan los datos al widget
         mv->Insert(pix,texto, precio);
         ui->auxGrild->minimumSize();
+        //Se establece en que posicion ira
         ui->auxGrild->addWidget(mv, i/2, i%2, Qt::Alignment());
-
-        /*if (texto.contains(bus, Qt::CaseInsensitive) == true) {
-
-
-        }*/
-
     }
-    //Se recorre el array
-    /*for (int i = 0;i < jsonArray.size(); i++) {
-        //Se crea un nuevo objeto y se pasan los datos del array
-        QJsonObject jobj = jsonArray.at(i).toObject();
-        imagen = jobj["id"].toString();
-        //Se creaa un nuevo QWidged cada vez
-        MainWidget *mv = new MainWidget();
-        //Se le asigna el tamaño minimo
-        mv->setMinimumSize(250,250);
-        //Compara si el combobox esta en la posicion 0
-        //En este caso mostrara todos
-        if (item == 0)
-        {
-            texto = jobj["name"].toString();
-            precio = jobj["price"].toDouble();
-            //Se crea un pixmap con la direccion de las imagenes
-            QPixmap pix("/Users/lalo/Desktop/Amazone/imgs/" + imagen);
-            //Se le agregan los datos al objeto
-            mv->Insert(pix,texto, precio);
-            //Se establece que acepte el tamaño minimo
-            ui->auxGrild->minimumSize();
-            //Se agregan los widget en la posicion indicada
-            ui->auxGrild->addWidget(mv, i/2, i%2, Qt::Alignment());
-        }
-        //Si el combobox esta en la posicion 1
-        else if (item == 1){
-            //En el JsonArray buscara aquellas que inicien con "AB"
-            if(imagen.startsWith("AB") == true){
-                //Si es asi pasa los datos
-                texto = jobj["name"].toString();
-                precio = jobj["price"].toDouble();
-                QPixmap pix("/Users/lalo/Desktop/Amazone/imgs/" + imagen);
-                mv->Insert(pix,texto, precio);
-                ui->auxGrild->minimumSize();
-                ui->auxGrild->addWidget(mv, i/2, i%2, Qt::Alignment());
-            }
-        }
-        //Si esta en la posicion 2
-        else if (item == 2){
-            //Si inicia con "L"
-            if(imagen.startsWith("L") == true){
-                texto = jobj["name"].toString();
-                precio = jobj["price"].toDouble();
-                QPixmap pix("/Users/lalo/Desktop/Amazone/imgs/" + imagen);
-                mv->Insert(pix,texto, precio);
-                ui->auxGrild->minimumSize();
-                ui->auxGrild->addWidget(mv, i/2, i%2, Qt::Alignment());
-            }
-        }
-        //Si esta en la posicion 3
-        else if (item == 3){
-            //Si inicia con "E"
-            if(imagen.startsWith("E") == true){
-                texto = jobj["name"].toString();
-                precio = jobj["price"].toDouble();
-                QPixmap pix("/Users/lalo/Desktop/Amazone/imgs/" + imagen);
-                mv->Insert(pix,texto, precio);
-                ui->auxGrild->minimumSize();
-                ui->auxGrild->addWidget(mv, i/2, i%2, Qt::Alignment());
-            }
-        }
-        //Si esta en la posicion 4
-        else if (item == 4){
-            //Si inicia con "HC"
-            if(imagen.startsWith("HC") == true){
-                texto = jobj["name"].toString();
-                precio = jobj["price"].toDouble();
-                QPixmap pix("/Users/lalo/Desktop/Amazone/imgs/" + imagen);
-                mv->Insert(pix,texto, precio);
-                ui->auxGrild->minimumSize();
-                ui->auxGrild->addWidget(mv, i/2, i%2, Qt::Alignment());
-            }
-        }
-        //Si esta en la posicion 5
-        else if (item == 5){
-            //Si inicia con "D"
-            if(imagen.startsWith("D") == true){
-                texto = jobj["name"].toString();
-                precio = jobj["price"].toDouble();
-                QPixmap pix("/Users/lalo/Desktop/Amazone/imgs/" + imagen);
-                mv->Insert(pix,texto, precio);
-                ui->auxGrild->minimumSize();
-                ui->auxGrild->addWidget(mv, i/2, i%2, Qt::Alignment());
-            }
-        }
-    }*/
     //Se cierra el archivo
     dbFile.close();
+    //Limpia el vector
+    products.clear();
 }
 
 //Funcion que detecta cual opcion esta seleccionada
 void MainWindow::on_cbOpciones_activated(int index)
 {
-    //Se crea un nuevo MainWindow
-    m = new MainWindow();
-    //Se le asigna la direccion del archivo
-    m->setFileName(getFileName());
-    //Se le asigna el index en el que esta actualmente el combobox
-    //Esto para que al abrir la nueva ventana este seleccionado ese
-    m->ui->cbOpciones->setCurrentIndex(index);
-    m->ui->cbOrdenar->setCurrentIndex(ui->cbOrdenar->currentIndex());
-    //Se le indica donde debe abrir
-    m->ui->stackedWidget->setCurrentIndex(2);
-    //Se le pasan los datos del archivo
-    m->dbFile.setFileName(m->getFileName());
-    //Se llama a la funcion y manda el index en el que esta seleccionado
-    m->llenarWidget(index, ui->cbOrdenar->currentIndex());
-    //Se abre la ventana nueva
-    m->show();
-    //Se cierra la actual
-    close();
+    //Se limpia el Gridlayout
+    QLayoutItem* item;
+    while ( ( item = ui->auxGrild->takeAt(0)) != nullptr )
+    {
+        delete item->widget();
+        delete item;
+    }
+    //Se mandan los parametros para llenar el widget
+    llenarWidget(index,ui->cbOrdenar->currentIndex(),ui->buscarLE->text());
 }
-
-
 
 void MainWindow::on_cbOrdenar_activated(int index)
 {
-    //Se crea un nuevo MainWindow
-    m = new MainWindow();
-    //Se le asigna la direccion del archivo
-    m->setFileName(getFileName());
-    //Se le asigna el index en el que esta actualmente el combobox
-    //Esto para que al abrir la nueva ventana este seleccionado ese
-    m->ui->cbOpciones->setCurrentIndex(ui->cbOpciones->currentIndex());
-    m->ui->cbOrdenar->setCurrentIndex(index);
-    //Se le indica donde debe abrir
-    m->ui->stackedWidget->setCurrentIndex(2);
-    //Se le pasan los datos del archivo
-    m->dbFile.setFileName(m->getFileName());
-    //Se llama a la funcion y manda el index en el que esta seleccionado
-    m->llenarWidget(ui->cbOpciones->currentIndex(),index);
-    //Se abre la ventana nueva
-    m->show();
-    //Se cierra la actual
-    close();
+    QLayoutItem* item;
+    while ( ( item = ui->auxGrild->takeAt(0)) != nullptr )
+    {
+        delete item->widget();
+        delete item;
+    }
+    llenarWidget(ui->cbOpciones->currentIndex(),index,ui->buscarLE->text());
 }
 
 void MainWindow::on_buscarLE_textEdited(const QString &arg1)
 {
-    //Se crea un nuevo MainWindow
-    m = new MainWindow();
-    //Se le asigna la direccion del archivo
-    m->setFileName(getFileName());
-    //Se le asigna el index en el que esta actualmente el combobox
-    //Esto para que al abrir la nueva ventana este seleccionado ese
-    m->ui->cbOpciones->setCurrentIndex(ui->cbOpciones->currentIndex());
-    m->ui->cbOrdenar->setCurrentIndex(ui->cbOrdenar->currentIndex());
-    m->ui->buscarLE->setText(arg1);
-    //Se le indica donde debe abrir
-    m->ui->stackedWidget->setCurrentIndex(2);
-    //Se le pasan los datos del archivo
-    m->dbFile.setFileName(m->getFileName());
-    //Se llama a la funcion y manda el index en el que esta seleccionado
-    m->llenarWidget(ui->cbOpciones->currentIndex(),ui->cbOrdenar->currentIndex(), arg1);
-    //Se abre la ventana nueva
-    m->show();
-    //Se cierra la actual
-    close();
+    QLayoutItem* item;
+    while ( ( item = ui->auxGrild->takeAt(0)) != nullptr )
+    {
+        delete item->widget();
+        delete item;
+    }
+    llenarWidget(ui->cbOpciones->currentIndex(),ui->cbOrdenar->currentIndex(),arg1);
 }

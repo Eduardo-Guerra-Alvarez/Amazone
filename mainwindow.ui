@@ -621,9 +621,9 @@ background-color: lightgray;</string>
         <property name="geometry">
          <rect>
           <x>9</x>
-          <y>79</y>
+          <y>69</y>
           <width>531</width>
-          <height>461</height>
+          <height>471</height>
          </rect>
         </property>
         <property name="styleSheet">
@@ -641,7 +641,7 @@ border: 2px solid white;
            <x>0</x>
            <y>0</y>
            <width>527</width>
-           <height>457</height>
+           <height>467</height>
           </rect>
          </property>
          <layout class="QGridLayout" name="gridLayout_4">
@@ -661,7 +661,7 @@ border: 2px solid white;
           <x>9</x>
           <y>9</y>
           <width>531</width>
-          <height>31</height>
+          <height>24</height>
          </rect>
         </property>
         <property name="styleSheet">
@@ -708,16 +708,22 @@ border: 2px solid white;
         </item>
        </widget>
        <widget class="QLineEdit" name="buscarLE">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>10</x>
-          <y>50</y>
+          <y>40</y>
           <width>381</width>
           <height>24</height>
          </rect>
         </property>
         <property name="mouseTracking">
          <bool>true</bool>
+        </property>
+        <property name="tabletTracking">
+         <bool>false</bool>
         </property>
         <property name="styleSheet">
          <string notr="true">color: white;
@@ -728,15 +734,27 @@ border: 2px solid white;
         <property name="text">
          <string/>
         </property>
+        <property name="echoMode">
+         <enum>QLineEdit::Normal</enum>
+        </property>
+        <property name="cursorPosition">
+         <number>0</number>
+        </property>
+        <property name="dragEnabled">
+         <bool>false</bool>
+        </property>
         <property name="placeholderText">
          <string>Buscar...</string>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>false</bool>
         </property>
        </widget>
        <widget class="QComboBox" name="cbOrdenar">
         <property name="geometry">
          <rect>
           <x>400</x>
-          <y>50</y>
+          <y>40</y>
           <width>141</width>
           <height>24</height>
          </rect>
@@ -759,12 +777,12 @@ border: 2px solid white;
         </item>
         <item>
          <property name="text">
-          <string>Asendente</string>
+          <string>Ascendente</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>Desendente</string>
+          <string>Descendente</string>
          </property>
         </item>
        </widget>

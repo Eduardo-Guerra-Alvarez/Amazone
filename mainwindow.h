@@ -45,6 +45,8 @@ private slots:
 
     void on_buscarLE_textEdited(const QString &arg1);
 
+    //void on_cbOpciones_currentIndexChanged(int index);
+
 private:
     Ui::MainWindow *ui;
     vector<User> users;
