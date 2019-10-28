@@ -30,3 +30,55 @@ void MainWidget::Agregar(QPixmap pixmap, QString string, double precio)
     ui->lbTexto->setText(string);
     ui->lbPrice->setText("$" + QString::number(precio));
 }
+
+
+//Cuando se presiona el boton
+void MainWidget::on_comprarPB_clicked()
+{
+    /*
+     * Emite una señal con la cantidad de productos comprados
+     * Tambien envia una señal con el id del producto
+    */
+    emit added(ui->spinBox->value(), id);
+}
+
+
+void MainWidget::setID(const QString &value)
+{
+    id = value;
+}
+
+QString MainWidget::getID() const
+{
+    return id;
+}
+
+void MainWidget::setDescription(const QString &value)
+{
+    description = value;
+}
+
+QString MainWidget::getDescription() const
+{
+    return description;
+}
+
+void MainWidget::setPrice(const double &value)
+{
+    price = value;
+}
+
+double MainWidget::getPrice() const
+{
+    return price;
+}
+
+void MainWidget::setSold(const int &value)
+{
+    sold = value;
+}
+
+int MainWidget::getSold() const
+{
+    return sold;
+}

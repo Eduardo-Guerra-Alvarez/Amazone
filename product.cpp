@@ -35,6 +35,16 @@ double Product::getPrice() const
     return price;
 }
 
+void Product::setSold(const int &value)
+{
+    sold = value;
+}
+
+int Product::getSold() const
+{
+    return sold;
+}
+
 bool Product::operator >(Product const &value) const
 {
     return price > value.price;

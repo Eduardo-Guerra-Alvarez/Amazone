@@ -3,22 +3,26 @@
         {
             "id": "AB01",
             "name": "McCormick, Mermelada, 165 gramos",
-            "price": 29.81
+            "price": 29.81,
+            "sold": 103
         },
         {
             "id": "AB02",
             "name": "Herdez Atún en Aceite, 295 g",
-            "price": 36.82
+            "price": 36.82,
+            "sold": 171
         },
         {
             "id": "AB03",
             "name": "Maggi, Hojas sazonadoras, 4 piezas",
-            "price": 11.36
+            "price": 11.36,
+            "sold": 38
         },
         {
             "id": "AB04",
             "name": "Nescafe, Café soluble, 120 gramos",
-            "price": 59
+            "price": 59,
+            "sold": 10
         },
         {
             "id": "AB05",
@@ -38,7 +42,8 @@
         {
             "id": "AB08",
             "name": "Peñafiel Refresco Sabor Limonada, 600 ml",
-            "price": 10.7
+            "price": 10.7,
+            "sold": 3
         },
         {
             "id": "AB09",
@@ -48,12 +53,14 @@
         {
             "id": "AB10",
             "name": "Bonafont Agua Natural De 1.5Lt",
-            "price": 9.5
+            "price": 9.5,
+            "sold": 4
         },
         {
             "id": "L01",
             "name": "Mastering Bitcoin: Programming the Open Blockchain",
-            "price": 714.33
+            "price": 714.33,
+            "sold": 8
         },
         {
             "id": "L02",

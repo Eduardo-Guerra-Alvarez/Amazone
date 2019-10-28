@@ -40,12 +40,10 @@ private slots:
     void on_CreatePB_clicked();
     void openFile();
     void on_cbOpciones_activated(int index);
-
     void on_cbOrdenar_activated(int index);
-
     void on_buscarLE_textEdited(const QString &arg1);
-
-    //void on_cbOpciones_currentIndexChanged(int index);
+    //Funcion que recibe parametros de la coneccion entre Widget y la ventana principal
+    void addProduct(int sold, QString id);
 
 private:
     Ui::MainWindow *ui;
@@ -55,16 +53,17 @@ private:
     QAction *openFileAction;
     QString fileName;
     QJsonArray jsonArray;
+    QJsonArray jsonArrProducts;
     QFile dbFile;
     MainWindow *m;
+    User us;
 
     void enableLoginPB();
     void enableCreatePB();
     void loadDB();
     void saveDB();
     void llenarWidget(int item = 0, int order = 0, QString bus = "");
-    void setFileName(QString fileName);
-    QString getFileName();
+    QString fecha;
 };
 
 #endif // MAINWINDOW_H

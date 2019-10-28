@@ -5,6 +5,7 @@
 #include <QDebug>
 #include "mainwidget.h"
 #include <QGridLayout>
+#include <QDateTime>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -15,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent) :
     openFileAction = new QAction(tr("Abrir Archivo"), this);
     connect(openFileAction, SIGNAL(triggered()), this, SLOT(openFile()));
     fileMenu->addAction(openFileAction);
+    fecha = QDateTime::currentDateTime().toString("dd/MM/yy HH:mm:ss");
 }
 
 MainWindow::~MainWindow()
@@ -25,22 +27,11 @@ MainWindow::~MainWindow()
 void MainWindow::openFile()
 {
     fileName = QFileDialog::getOpenFileName(this, "DataBase", "", "Archivos JSON (*.json)");
-    setFileName(fileName);
     if (fileName.length() > 0)
     {
         dbFile.setFileName(fileName);
         loadDB();
     }
-}
-
-void MainWindow::setFileName(QString fileName)
-{
-    this->fileName = fileName;
-}
-
-QString MainWindow::getFileName()
-{
-    return fileName;
 }
 
 
@@ -61,6 +52,7 @@ void MainWindow::loadDB()
     jsonObj = jsonDoc.object();
     //Asignamos informacion al arreglo de objetos json
     jsonArray = jsonObj["users"].toArray();
+    jsonArrProducts = jsonObj["producs"].toArray();
     //Cerramos el archivo
     dbFile.close();
 }
@@ -72,7 +64,8 @@ void MainWindow::saveDB()
       //Arbir el archivo como modo escritura
       dbFile.open(QIODevice::WriteOnly);
       //Guarda el arreglo de objetos en un objeto Json
-      jsonObj["user"] = jsonArray;
+      jsonObj["users"] = jsonArray;
+      jsonObj["products"] = jsonArrProducts;
       //Crea un documento Json a partir de un objeto Json
       jsonDoc = QJsonDocument(jsonObj);
       //Escribe al archivo el documento en formato json
@@ -235,6 +228,7 @@ void MainWindow::on_loginPB_clicked()
         {
             if  (jobj["password"].toString() == ui->passwordLE->text())
             {
+                us.setEmail(ui->emailLE->text());
                 ui->emailLE->clear();
                 ui->passwordLE->clear();
                 ui->stackedWidget->setCurrentIndex(2);
@@ -277,14 +271,15 @@ void MainWindow::llenarWidget(int item, int order, QString bus)
     //Creamos el objeto json a partir del documento
     jsonObj = jsonDoc.object();
     //Asignamos informacion al arreglo de objetos json
-    jsonArray = jsonObj["products"].toArray();
+    jsonArrProducts = jsonObj["products"].toArray();
 
-    for (int i = 0;i < jsonArray.size();i++) {
-        QJsonObject jobj = jsonArray.at(i).toObject();
+    for (int i = 0;i < jsonArrProducts.size();i++) {
+        QJsonObject jobj = jsonArrProducts.at(i).toObject();
         Product p;
         p.setID(jobj["id"].toString());
         p.setDescription(jobj["name"].toString());
         p.setPrice(jobj["price"].toDouble());
+        p.setSold(jobj["sold"].toInt());
         //Comprueba que la palabra a buscar coincida con la descripcion
         //sin importar mayusculas o minusculas
         if (p.getDescription().contains(bus, Qt::CaseInsensitive) == true){
@@ -341,14 +336,20 @@ void MainWindow::llenarWidget(int item, int order, QString bus)
 
     QString imagen, texto;
     double precio;
+    int sold;
     //Se recorre el vector
     size_t i = 0;
     for (;i < products.size();i++) {
         imagen = products.at(i).getID();
         texto = products.at(i).getDescription();
         precio = products.at(i).getPrice();
+        sold = products.at(i).getSold();
         //Se creaa un nuevo QWidged cada vez
         MainWidget *mv = new MainWidget;
+        mv->setID(imagen);
+        mv->setDescription(texto);
+        mv->setPrice(precio);
+        mv->setSold(sold);
         //Se le asigna el tamaño minimo
         mv->setMinimumSize(250,250);
         //Se le da la ruta de la imagen a insertar
@@ -356,6 +357,11 @@ void MainWindow::llenarWidget(int item, int order, QString bus)
         //Se mandan los datos al widget
         mv->Insert(pix,texto, precio);
         ui->auxGrild->minimumSize();
+        /*
+         * Antes de llenar el Widget se conecta la señal que se envio
+         * con el slot de mainWindow
+         */
+        connect(mv, SIGNAL(added(int,QString)), this, SLOT(addProduct(int,QString)));
         //Se establece en que posicion ira
         ui->auxGrild->addWidget(mv, i/2, i%2, Qt::Alignment());
     }
@@ -399,4 +405,128 @@ void MainWindow::on_buscarLE_textEdited(const QString &arg1)
         delete item;
     }
     llenarWidget(ui->cbOpciones->currentIndex(),ui->cbOrdenar->currentIndex(),arg1);
+}
+
+//Slot que recibe la señal
+void MainWindow::addProduct(int sold, QString id)
+{
+    QByteArray data;
+    QJsonObject jsonObj;
+    QJsonObject jsonObjTem;
+    QJsonObject jsonOb;
+    QJsonObject jsonObjF;
+    QJsonDocument jsonDoc;
+    QJsonArray jsonTemp;
+    QJsonArray jsonArrFecha;
+    bool encontrado = false;
+
+    //Abrimos el archivo
+    dbFile.open(QIODevice::ReadOnly);
+    //Leemos los bytes
+    data = dbFile.readAll();
+    //Creamos el documento json a partir de los bytes leidos
+    jsonDoc = QJsonDocument(QJsonDocument::fromJson(data));
+    //Creamos el objeto json a partir del documento
+    jsonObj = jsonDoc.object();
+    //Asignamos informacion al arreglo de objetos json
+    jsonArrProducts = jsonObj["products"].toArray();
+    jsonArray = jsonObj["users"].toArray();
+    dbFile.close();
+    //Recorremos el arreglo de productos
+    for (int i = 0; i < jsonArrProducts.size(); i++) {
+        //Pasamos el objeto que esta en cierta posicion
+        QJsonObject jsonObj = jsonArrProducts.at(i).toObject();
+        //Si el id del objeto coincide con el recibido por la señal
+        if  (jsonObj["id"].toString() == id){
+            //Sumamos la cantidad con la ya establecida
+            jsonObj["sold"] = jsonObj["sold"].toInt() + sold;
+            //Remplazamos el objeto con los datos ya modificados
+            jsonArrProducts.replace(i,jsonObj);
+            saveDB();
+        }
+    }
+    //Abrimos el archivo
+    dbFile.open(QIODevice::ReadOnly);
+    //Recorremos el arreglo de usuarios
+    for (int i = 0; i < jsonArray.size();i++) {
+        //Pasamoes el objeto que esta en cierta posicion
+        QJsonObject jsonObj = jsonArray.at(i).toObject();
+        //Comprobamos el email con el que se inicio sesion
+        if  (jsonObj["email"].toString() == us.getEmail()) {
+            //Asignamos informacion al arreglo de objetos json de shopping
+            jsonTemp = jsonObj["purchase"].toArray();
+            int j = 0;
+            //Recorremos el arreglo shopping
+            for (; j < jsonTemp.size(); i++) {
+                //Pasamos los datos a un objeto
+                QJsonObject jsonOb = jsonTemp.at(j).toObject();
+                //Verificamos si el objeto esta vacio
+                if (jsonOb.isEmpty() == false) {
+                    //Si no esta vacio pasamos el arreglo de objetos json de fecha
+                    jsonArrFecha = jsonOb[fecha].toArray();
+                    int k = 0;
+                    //Recorremos el arreglo de fecha
+                    for (;k < jsonArrFecha.size(); k++) {
+                        //Pasamos los datos a un objeto
+                        QJsonObject jsonObjF = jsonArrFecha.at(k).toObject();
+                        //Comparamos que el id del objeto coincida con el enviado por el slot
+                        if (jsonObjF["id"] == id) {
+                            //Modificamos en el array el objeto modificado
+                            jsonArrFecha.replace(k,jsonObjF);
+                            //Decimos que fue verdadero
+                            encontrado = true;
+                            //Rompemos el bucle
+                            break;
+                        }
+                    }
+                    //En caso de no ser encontrado
+                    if (encontrado == false) {
+                        //Pasamos el id y sold al objeto
+                        jsonObjF["id"] = id;
+                        //Agregamos el objeto al final
+                        jsonArrFecha.append(jsonObjF);
+                    }
+                    //Guarda el arreglo de objetos en un objeto Json Fecha
+                    jsonOb[fecha] = jsonArrFecha;
+                    //Modificamos en elarray el objeto modificado
+                    jsonTemp.replace(j,jsonOb);
+                    //Guarda el arreglo de objetos en un objeto Json shopping
+                    jsonObj["purchase"] = jsonTemp;
+                    //Modificamos en elarray el objeto modificado
+                    jsonArray.replace(i,jsonObj);
+                    dbFile.close();
+                    saveDB();
+                    break;
+                }
+            }
+            //En caso de que el temporal llegue al final
+            if (j == jsonTemp.size()) {
+                jsonArrFecha = jsonOb[fecha].toArray();
+                int k = 0;
+                for (;k < jsonArrFecha.size(); k++) {
+                    QJsonObject jsonObjF = jsonArrFecha.at(k).toObject();
+                    if (jsonObjF["id"] == id) {
+                        jsonArrFecha.replace(k,jsonObjF);
+                        encontrado = true;
+                        break;
+                    }
+                }
+                if (encontrado == false) {
+                    jsonObjF["id"] = id;
+                    jsonArrFecha.append(jsonObjF);
+                }
+                jsonOb[fecha] = jsonArrFecha;
+                jsonTemp.append(jsonOb);
+                jsonObj["purchase"] = jsonTemp;
+                jsonArray.replace(i,jsonObj);
+                dbFile.close();
+                saveDB();
+                break;
+            }
+        }
+        else {
+            dbFile.close();
+        }
+    }
+
 }
