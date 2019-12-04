@@ -4,25 +4,25 @@
             "id": "AB01",
             "name": "McCormick, Mermelada, 165 gramos",
             "price": 29.81,
-            "sold": 103
+            "sold": 30
         },
         {
             "id": "AB02",
             "name": "Herdez Atún en Aceite, 295 g",
             "price": 36.82,
-            "sold": 171
+            "sold": 12
         },
         {
             "id": "AB03",
             "name": "Maggi, Hojas sazonadoras, 4 piezas",
             "price": 11.36,
-            "sold": 38
+            "sold": 5
         },
         {
             "id": "AB04",
             "name": "Nescafe, Café soluble, 120 gramos",
             "price": 59,
-            "sold": 10
+            "sold": 0
         },
         {
             "id": "AB05",
@@ -32,7 +32,8 @@
         {
             "id": "AB06",
             "name": "Boing Boing Jugo sabor Mango de 1 Lt",
-            "price": 13.5
+            "price": 13.5,
+            "sold": 3
         },
         {
             "id": "AB07",
@@ -43,24 +44,25 @@
             "id": "AB08",
             "name": "Peñafiel Refresco Sabor Limonada, 600 ml",
             "price": 10.7,
-            "sold": 3
+            "sold": 0
         },
         {
             "id": "AB09",
             "name": "Lala Leche UHT Entera con Tapa, 1.5 L, 10 Piezas",
-            "price": 294
+            "price": 294,
+            "sold": 2
         },
         {
             "id": "AB10",
             "name": "Bonafont Agua Natural De 1.5Lt",
             "price": 9.5,
-            "sold": 4
+            "sold": 0
         },
         {
             "id": "L01",
             "name": "Mastering Bitcoin: Programming the Open Blockchain",
             "price": 714.33,
-            "sold": 8
+            "sold": 0
         },
         {
             "id": "L02",
@@ -110,7 +112,8 @@
         {
             "id": "E01",
             "name": "Dell I3467_i581TBW10s_219 NOTEBOOK_COMPUTER, 14'', Intel core_i5 3.1GHz, 8GB, 1000GB, Windows 10",
-            "price": 13364.78
+            "price": 13364.78,
+            "sold": 32
         },
         {
             "id": "E02",
@@ -140,12 +143,14 @@
         {
             "id": "E07",
             "name": "Logitech Mouse para Gaming G502 Hero, 16000DPI, 11 Botones, color Negro",
-            "price": 798.98
+            "price": 798.98,
+            "sold": 3
         },
         {
             "id": "E08",
             "name": "Nikon Cámara Reflex D5600 conlente AF-P DX Nikkor 18-55mm f/3.5-5.6G VR",
-            "price": 14293.04
+            "price": 14293.04,
+            "sold": 4
         },
         {
             "id": "E09",
@@ -155,7 +160,8 @@
         {
             "id": "E10",
             "name": "GoPro Bundle HERO7 Black + Shorty con Batería Recargable, Cable USB C.7",
-            "price": 7399
+            "price": 7399,
+            "sold": 118
         },
         {
             "id": "HC01",
@@ -255,7 +261,8 @@
         {
             "id": "D10",
             "name": "Polar Bottle Kids Insulated Water Bottle",
-            "price": 187.79
+            "price": 187.79,
+            "sold": 17
         }
     ],
     "users": [
@@ -287,27 +294,105 @@
         {
             "email": "JAVIER.GALLEGOS@AMZ.com",
             "name": "JAVIER GALLEGOS",
-            "password": "JAGA033"
+            "password": "JAGA033",
+            "purchase": [
+                {
+                    "29/11/19 17:11:41": [
+                        {
+                            "id": "E10"
+                        },
+                        {
+                            "id": "E08"
+                        }
+                    ]
+                }
+            ]
         },
         {
             "email": "JESUS.GARZON@AMZ.com",
             "name": "JESUS GARZON",
-            "password": "JEGA067"
+            "password": "JEGA067",
+            "purchase": [
+                {
+                    "29/11/19 17:09:38": [
+                        {
+                            "id": "AB01"
+                        },
+                        {
+                            "id": "AB09"
+                        },
+                        {
+                            "id": "AB03"
+                        },
+                        {
+                            "id": "E07"
+                        },
+                        {
+                            "id": "E08"
+                        }
+                    ]
+                }
+            ]
         },
         {
             "email": "SERGIO.LOPEZ@AMZ.com",
             "name": "SERGIO LOPEZ",
-            "password": "SELO003"
+            "password": "SELO003",
+            "purchase": [
+                {
+                    "29/11/19 13:48:14": [
+                        {
+                            "id": "AB01"
+                        },
+                        {
+                            "id": "AB02"
+                        },
+                        {
+                            "id": "AB03"
+                        }
+                    ]
+                }
+            ]
         },
         {
             "email": "CRUZ.ESPINOZA@AMZ.com",
             "name": "CRUZ ESPINOZA",
-            "password": "CRES023"
+            "password": "CRES023",
+            "purchase": [
+                {
+                    "29/11/19 13:32:33": [
+                        {
+                            "id": "AB03"
+                        },
+                        {
+                            "id": "AB02"
+                        },
+                        {
+                            "id": "AB01"
+                        }
+                    ]
+                }
+            ]
         },
         {
             "email": "LUCERO.MENDEZ@AMZ.com",
             "name": "LUCERO MENDEZ",
-            "password": "LUME032"
+            "password": "LUME032",
+            "purchase": [
+                {
+                    "29/11/19 13:31:27": [
+                        {
+                            "id": "AB01"
+                        },
+                        {
+                            "id": "AB02"
+                        },
+                        {
+                            "id": "AB03"
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }

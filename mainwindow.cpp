@@ -233,6 +233,8 @@ void MainWindow::on_loginPB_clicked()
                 ui->passwordLE->clear();
                 ui->stackedWidget->setCurrentIndex(2);
                 llenarWidget();
+                llenarVentana2();
+                addGrafo();
                 break;
             }
             else {
@@ -371,6 +373,73 @@ void MainWindow::llenarWidget(int item, int order, QString bus)
     products.clear();
 }
 
+void MainWindow::llenarVentana2()
+{
+    QString imagen, texto;
+    double precio;
+    int sold;
+    //Se cierra el archivo en caso de que este abierto
+    dbFile.close();
+    QByteArray data;
+    QJsonObject jsonObj;
+    QJsonDocument jsonDoc;
+    //Abrimos el archivo
+    dbFile.open(QIODevice::ReadOnly);
+    //Leemos los bytes
+    data = dbFile.readAll();
+    //Creamos el documento json a partir de los bytes leidos
+    jsonDoc = QJsonDocument(QJsonDocument::fromJson(data));
+    //Creamos el objeto json a partir del documento
+    jsonObj = jsonDoc.object();
+    //Asignamos informacion al arreglo de objetos json
+    jsonArrProducts = jsonObj["products"].toArray();
+
+    for (int i = 0;i < jsonArrProducts.size();i++) {
+        QJsonObject jobj = jsonArrProducts.at(i).toObject();
+        Product p;
+        p.setID(jobj["id"].toString());
+        p.setDescription(jobj["name"].toString());
+        p.setPrice(jobj["price"].toDouble());
+        p.setSold(jobj["sold"].toInt());
+
+        colaPri.push(p);
+    }
+
+    for (int i = 0;i < 3;i++) {
+        imagen = colaPri.top().getID();
+        texto = colaPri.top().getDescription();
+        precio = colaPri.top().getPrice();
+        sold = colaPri.top().getSold();
+
+        colaPri.pop();
+
+        MainWidget *mv = new MainWidget;
+        mv->setID(imagen);
+        mv->setDescription(texto);
+        mv->setPrice(precio);
+        mv->setSold(sold);
+
+        mv->setMinimumSize(250,250);
+        //Se le da la ruta de la imagen a insertar
+        QPixmap pix("/Users/lalo/Desktop/Amazone/imgs/" + imagen);
+        //Se mandan los datos al widget
+        mv->Insert(pix,texto, precio);
+        ui->auxGrild->minimumSize();
+        /*
+         * Antes de llenar el Widget se conecta la señal que se envio
+         * con el slot de mainWindow
+         */
+        connect(mv, SIGNAL(added(int,QString)), this, SLOT(addProduct(int,QString)));
+        //Se establece en que posicion ira
+        ui->auxGrildPre->addWidget(mv, i/2, i%2, Qt::Alignment());
+    }
+    //Se cierra el archivo
+    dbFile.close();
+    while (!colaPri.empty()) {
+        colaPri.pop();
+    }
+}
+
 //Funcion que detecta cual opcion esta seleccionada
 void MainWindow::on_cbOpciones_activated(int index)
 {
@@ -407,9 +476,188 @@ void MainWindow::on_buscarLE_textEdited(const QString &arg1)
     llenarWidget(ui->cbOpciones->currentIndex(),ui->cbOrdenar->currentIndex(),arg1);
 }
 
+void MainWindow::addGrafo() {
+    QByteArray data;
+    QJsonObject jsonObj;
+    QJsonObject jsonAri;
+    QJsonDocument jsonDoc;
+    QJsonArray purchase;
+    QJsonArray jsonFecha;
+    QStringList keys;
+    QString key;
+    QHash<QString, QHash<QString, int> >::iterator origen;
+    bool encontrado = false;
+
+    //Abrimos el archivo
+    dbFile.open(QIODevice::ReadOnly);
+    //Leemos los bytes
+    data = dbFile.readAll();
+    //Creamos el documento json a partir de los bytes leidos
+    jsonDoc = QJsonDocument(QJsonDocument::fromJson(data));
+    //Creamos el objeto json a partir del documento
+    jsonObj = jsonDoc.object();
+    //Asignamos informacion al arreglo de objetos json
+    jsonArray = jsonObj["users"].toArray();
+    dbFile.close();
+
+    for (int i = 0; i < jsonArray.size(); i++) {
+        jsonObj = jsonArray.at(i).toObject();
+        purchase = jsonObj["purchase"].toArray();
+        for (int j = 0; j < purchase.size(); j++) {
+            jsonObj = purchase.at(j).toObject();
+            keys = jsonObj.keys();
+            for (int a = 0; a < keys.size(); a++) {
+                key  = keys.at(a);
+            }
+            jsonFecha = jsonObj[key].toArray();
+            for (int k = 0; k < jsonFecha.size()-1; k++) {
+                jsonObj = jsonFecha.at(k).toObject();
+                for (int l = k+1; l < jsonFecha.size(); l++) {
+                    jsonAri = jsonFecha.at(l).toObject();
+                    if (searchGrafo(jsonObj["id"].toString(),jsonAri["id"].toString()) == false) {
+                        arista.insert(jsonAri["id"].toString(),1);
+                        encontrado = true;
+                    }
+                }
+                if (encontrado == true) {
+                    grafo.insertMulti(jsonObj["id"].toString(), arista);
+                    arista.clear();
+                }
+
+            }
+        }
+    }
+}
+
+void MainWindow::showGrafo(QString id) {
+    QString imagen, texto;
+    double precio;
+    int sold;
+    QByteArray data;
+    QJsonObject jsonObj;
+    QJsonDocument jsonDoc;
+    //Abrimos el archivo
+    dbFile.open(QIODevice::ReadOnly);
+    //Leemos los bytes
+    data = dbFile.readAll();
+    //Creamos el documento json a partir de los bytes leidos
+    jsonDoc = QJsonDocument(QJsonDocument::fromJson(data));
+    //Creamos el objeto json a partir del documento
+    jsonObj = jsonDoc.object();
+    //Asignamos informacion al arreglo de objetos json
+    jsonArrProducts = jsonObj["products"].toArray();
+    dbFile.close();
+
+
+    priority_queue <Grafo, vector<Grafo>, Grafo::comparador> colaGrafo;
+    QHash<QString, QHash<QString, int> >::iterator origen;
+    origen = grafo.begin();
+
+    while (origen != grafo.end()) {
+        QHash<QString,int>::iterator destino;
+        destino = origen.value().begin();
+
+        while (destino != origen.value().end()) {
+             Grafo g;
+            if (origen.key() == id) {
+                g.setId(destino.key());
+                g.setPeso(destino.value());
+                colaGrafo.push(g);
+            }
+            if (destino.key() == id) {
+                g.setId(origen.key());
+                g.setPeso(destino.value());
+                colaGrafo.push(g);
+            }
+            //qDebug() << origen.key() << "," << destino.key() << "=" << destino.value() ;
+            ++destino;
+        }
+        ++origen;
+    }
+
+    while (!colaGrafo.empty()) {
+        qDebug() << colaGrafo.top().getId();
+        for (int i = 0; i < jsonArrProducts.size(); i++) {
+            jsonObj = jsonArrProducts.at(i).toObject();
+            if (colaGrafo.top().getId() == jsonObj["id"].toString()) {
+                Product p;
+                p.setID(jsonObj["id"].toString());
+                p.setDescription(jsonObj["name"].toString());
+                p.setPrice(jsonObj["price"].toDouble());
+                p.setSold(jsonObj["sold"].toInt());
+                products.push_back(p);
+            }
+        }
+        colaGrafo.pop();
+    }
+
+    for (int i = 0; i < products.size(); i++) {
+        if (i >= 3)
+            break;
+        imagen = products.at(i).getID();
+        texto = products.at(i).getDescription();
+        precio = products.at(i).getPrice();
+        sold = products.at(i).getSold();
+
+        MainWidget *mv = new MainWidget;
+        mv->setID(imagen);
+        mv->setDescription(texto);
+        mv->setPrice(precio);
+        mv->setSold(sold);
+
+        mv->setMinimumSize(250,250);
+        //Se le da la ruta de la imagen a insertar
+        QPixmap pix("/Users/lalo/Desktop/Amazone/imgs/" + imagen);
+        //Se mandan los datos al widget
+        mv->Insert(pix,texto, precio);
+        ui->auxGrild->minimumSize();
+        /*
+         * Antes de llenar el Widget se conecta la señal que se envio
+         * con el slot de mainWindow
+         */
+        connect(mv, SIGNAL(added(int,QString)), this, SLOT(addProduct(int,QString)));
+        //Se establece en que posicion ira
+        ui->auxGrildPre->addWidget(mv, i/2, i%2, Qt::Alignment());
+    }
+    products.clear();
+}
+
+bool MainWindow::searchGrafo(QString g, QString a) {
+    QHash<QString, QHash<QString, int> >::iterator origen;
+    origen = grafo.begin();
+    while (origen != grafo.end()) {
+        QHash<QString,int>::iterator destino;
+        destino = origen.value().begin();
+        while (destino != origen.value().end()) {
+            if ((origen.key() == g && destino.key() == a) ||
+                    (origen.key() == a && destino.key() == g)) {
+                destino.value() += 1;
+                return true;
+            }
+            ++destino;
+        }
+        ++origen;
+    }
+    return false;
+}
+
+void MainWindow::clear2()
+{
+    QLayoutItem* item;
+    while ( ( item = ui->auxGrildPre->takeAt(0)) != nullptr )
+    {
+        delete item->widget();
+        delete item;
+    }
+}
+
+
+
 //Slot que recibe la señal
 void MainWindow::addProduct(int sold, QString id)
 {
+    clear2();
+    showGrafo(id);
     QByteArray data;
     QJsonObject jsonObj;
     QJsonObject jsonObjTem;
@@ -432,6 +680,9 @@ void MainWindow::addProduct(int sold, QString id)
     jsonArrProducts = jsonObj["products"].toArray();
     jsonArray = jsonObj["users"].toArray();
     dbFile.close();
+    if (sold > 0) {
+
+
     //Recorremos el arreglo de productos
     for (int i = 0; i < jsonArrProducts.size(); i++) {
         //Pasamos el objeto que esta en cierta posicion
@@ -528,5 +779,5 @@ void MainWindow::addProduct(int sold, QString id)
             dbFile.close();
         }
     }
-
+    }
 }

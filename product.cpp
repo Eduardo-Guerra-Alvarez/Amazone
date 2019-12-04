@@ -50,9 +50,21 @@ bool Product::operator >(Product const &value) const
     return price > value.price;
 }
 
+bool Product::operator >=(const Product &value) const
+{
+    return price >= value.price;
+}
+
 bool Product::operator <(Product const &value) const
 {
     return price < value.price;
 }
+
+bool Product::operator <=(const Product &value) const
+{
+    return price <= value.price;
+}
+
+
 
 

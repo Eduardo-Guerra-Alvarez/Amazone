@@ -25,6 +25,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 CONFIG += c++11
 
 SOURCES += \
+        grafo.cpp \
         main.cpp \
         mainwidget.cpp \
         mainwindow.cpp \
@@ -32,6 +33,7 @@ SOURCES += \
         user.cpp
 
 HEADERS += \
+        grafo.h \
         mainwidget.h \
         mainwindow.h \
         product.h \

@@ -18,7 +18,16 @@ public:
 
 
     bool operator >(Product const &value) const;
+    bool operator >= (Product const &value) const;
     bool operator <(Product const &value) const;
+    bool operator <=(Product const &value) const;
+
+    //Para la cola prioridad
+    struct comparador {
+        bool operator()(Product &p1, Product &p2) {
+            return p1.getSold() < p2.getSold();
+        }
+    };
 private:
     QString id;
     QString description;
